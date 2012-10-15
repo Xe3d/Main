@@ -114,8 +114,8 @@ namespace Shooter
             player.Initialize(playerAnimation, playerPosition);
 
             // Load the parallaxing background
-            bgLayer1.Initialize(Content, "bgLayer1", GraphicsDevice.Viewport.Width, -1.1f);
-            bgLayer2.Initialize(Content, "bgLayer2", GraphicsDevice.Viewport.Width, -1.1f);
+            bgLayer1.Initialize(Content, "bgLayer1", GraphicsDevice.Viewport.Width, -2.1f);
+            bgLayer2.Initialize(Content, "bgLayer2", GraphicsDevice.Viewport.Width, -3.9f);
 
             mainBackground = Content.Load<Texture2D>("mainbackground");
 
@@ -155,8 +155,11 @@ namespace Shooter
             UpdatePlayer(gameTime);
 
             // Update the parallaxing background
-            bgLayer1.Update();
-            bgLayer2.Update();
+            if (currentKeyboardState.IsKeyDown(Keys.A))
+            {
+                bgLayer1.Update();
+                bgLayer2.Update();
+            }
 
             // Update the enemies
             UpdateEnemies(gameTime);

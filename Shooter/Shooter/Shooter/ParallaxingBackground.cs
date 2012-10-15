@@ -31,7 +31,7 @@ namespace Shooter
 
             // If we divide the screen with the texture width then we can determine the number of tiles need.
             // We add 1 to it so that we won't have a gap in the tiling
-            positions = new Vector2[screenWidth / texture.Width + 1];
+            positions = new Vector2[screenWidth / texture.Width + 100];
 
 
             // Set the initial positions of the parallaxing background
@@ -48,7 +48,11 @@ namespace Shooter
             for (int i = 0; i < positions.Length; i++)
             {
                 // Update the position of the screen by adding the speed
-         positions[i].X = (float)Math.Ceiling(positions[i].X += speed);
+
+           var calcSpeed = (float)Math.Floor(positions[i].X += speed);
+                
+         positions[i].X = calcSpeed;
+                
                 
                 // If the speed has the background moving to the left
                 if (speed <= 0)
