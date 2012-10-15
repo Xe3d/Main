@@ -10,6 +10,7 @@ using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Media;
 using FarseerPhysics.Dynamics;
 using FarseerPhysics.Factories;
+using Physics.PhysicsObjects;
 
 namespace physics
 {
@@ -20,12 +21,14 @@ namespace physics
     {
         GraphicsDeviceManager graphics;
         SpriteBatch spriteBatch;
-        Texture2D texture;
+        
 
         //Farseer stuff
         World world;
-        Body body;
-    
+        List<DrawablePhysicsObject> crateList;
+        DrawablePhysicsObject floor;
+        KeyboardState prevKeyboardState;
+        Random random;
 
         public Game1()
         {
@@ -61,10 +64,17 @@ namespace physics
 
             world = new World(new Vector2(0, 9.8f));
 
-            texture = Content.Load<Texture2D>("wooden");
-
          
 
+            random = new Random();
+
+            floor = new DrawablePhysicsObject(world, Content.Load<Texture2D>("Floor"), new Vector2(GraphicsDevice.Viewport.Width, 100.0f), 1000);
+            floor.Position = new Vector2(GraphicsDevice.Viewport.Width / 2.0f, GraphicsDevice.Viewport.Height - 50);
+            floor.body.BodyType = BodyType.Static;
+
+            crateList = new List<DrawablePhysicsObject>();
+
+            prevKeyboardState = new KeyboardState();
 
             // TODO: use this.Content to load your game content here
         }
@@ -78,6 +88,16 @@ namespace physics
             // TODO: Unload any non ContentManager content here
         }
 
+
+        private void SpawnCrate()
+        {
+            DrawablePhysicsObject crate;
+            crate = new DrawablePhysicsObject(world, Content.Load<Texture2D>("wooden"), new Vector2(50.0f, 50.0f), 0.1f);
+            crate.Position = new Vector2(random.Next(50, GraphicsDevice.Viewport.Width - 50), 1);
+
+            crateList.Add(crate);
+        }
+
         /// <summary>
         /// Allows the game to run logic such as updating the world,
         /// checking for collisions, gathering input, and playing audio.
@@ -88,6 +108,14 @@ namespace physics
             // Allows the game to exit
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed)
                 this.Exit();
+
+            KeyboardState keyboardState = Keyboard.GetState();
+            if (keyboardState.IsKeyDown(Keys.Space) && !prevKeyboardState.IsKeyDown(Keys.Space))
+            {
+                SpawnCrate();
+            }
+
+            prevKeyboardState = keyboardState;
 
             world.Step((float)gameTime.ElapsedGameTime.TotalSeconds);
 
@@ -105,15 +133,21 @@ namespace physics
             GraphicsDevice.Clear(Color.CornflowerBlue);
 
             spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.Opaque);
-            Vector2 pos = body.Position * unitToPixel;
-            Vector2 scale = new Vector2(50.0f / (float)texture.Width, 50.0f / (float)texture.Height);
-          
+
+            foreach (DrawablePhysicsObject crate in crateList)
+            {
+                crate.Draw(spriteBatch);
+            }
+
+            floor.Draw(spriteBatch);
+
             spriteBatch.End();
 
-
+            floor.Draw(spriteBatch);
             // TODO: Add your drawing code here
 
             base.Draw(gameTime);
         }
+
     }
 }
