@@ -139,12 +139,12 @@ int frametime, Color color, float scale, bool looping)
 
 
         // Draw the Animation Strip
-        public void Draw(SpriteBatch spriteBatch)
+        public void Draw(SpriteBatch spriteBatch, float rotation)
         {
             // Only draw the animation when we are active
             if (Active)
             {
-                spriteBatch.Draw(spriteStrip, destinationRect, sourceRect, color);
+                spriteBatch.Draw(spriteStrip, destinationRect, sourceRect, color, rotation, Vector2.Zero, SpriteEffects.None, 0);
             }
         }
 

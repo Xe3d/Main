@@ -113,7 +113,7 @@ namespace Farseer331_Setup
             player = new DrawablePhysicsObject(world,null, new Vector2(36.0f, 48.0f), 1000);
           //  player = BodyFactory.CreateRectangle(world, 36*pixelToUnit, 48*pixelToUnit, 1f);
             player.Position = new Vector2(200.0f, 100.0f);
-            player.body.Rotation = 90;
+        //    player.body.Rotation = 90;
             player.body.BodyType = BodyType.Dynamic;
             
            
@@ -126,7 +126,7 @@ namespace Farseer331_Setup
             Animation playerAnimation = new Animation();
             Texture2D playerTexture = Content.Load<Texture2D>("shipAnimation");
             Texture2D spriteTexture = Content.Load<Texture2D>("jasperrun");
-            playerAnimation.Initialize(spriteTexture, new Vector2(192, 192), 32, 48, 4, 100, Color.White, 1f, true);
+            playerAnimation.Initialize(spriteTexture, new Vector2(0, 0), 32, 48, 4, 100, Color.White, 1f, true);
        
        //     playerAnimation.Initialize(playerTexture, new Vector2(0, 0), 115, 69, 8, 30, Color.White, 1f, true);
             playerObj.Initialize(playerAnimation, new Vector2(player.Position.X, player.Position.Y));
@@ -181,9 +181,9 @@ namespace Farseer331_Setup
             }
 
             
-            if (keyboardState.IsKeyDown(Keys.Space) && !prevKeyboardState.IsKeyDown(Keys.Space))
+            if (keyboardState.IsKeyDown(Keys.Space)&& (!prevKeyboardState.IsKeyDown(Keys.Space)))
             {
-                player.body.AngularVelocity += 80.0f;
+                player.body.LinearVelocity *= new Vector2(-1.0f, 0.0f);
             }
 
             if (keyboardState.IsKeyDown(Keys.R))
@@ -199,6 +199,15 @@ namespace Farseer331_Setup
                 cam.Pos += new Vector2(1f, 0f);
                 
                 
+            }
+
+
+            if (keyboardState.IsKeyDown(Keys.S))
+            {
+
+                cam.Pos += new Vector2(0f, 1f);
+
+
             }
 
             prevKeyboardState = keyboardState;
@@ -226,7 +235,7 @@ namespace Farseer331_Setup
                 crate.Draw(spriteBatch);
             }
 
-            playerObj.Draw(spriteBatch);
+            playerObj.Draw(spriteBatch, player.body.Rotation);
             floor.Draw(spriteBatch);
     //        spriteBatch.Draw(floorTexture,new Rectangle((int)floor.Position.X, (int)floor.Position.Y, (int)floorSize.X, (int)floorSize.Y), Color.White);
       //      spriteBatch.Draw(floorTexture, platform.Position, Color.White);

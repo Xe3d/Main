@@ -59,9 +59,9 @@ namespace Shooter
         }
 
         // Draw the player
-        public void Draw(SpriteBatch spriteBatch)
+        public void Draw(SpriteBatch spriteBatch, float rotation)
         {
-            PlayerAnimation.Draw(spriteBatch);
+            PlayerAnimation.Draw(spriteBatch, rotation);
         }
 
     }
