@@ -38,10 +38,14 @@ namespace Farseer331_Setup
         Random random;
         Player playerObj;
         public Camera2D cam = new Camera2D();
+        ParticleEngine particleEngine;
+
 
         public const float unitToPixel = 100.0f;
         public const float pixelToUnit = 1 / unitToPixel;
 
+
+        
 
         public Game1()
         {
@@ -80,6 +84,7 @@ namespace Farseer331_Setup
             random = new Random();
 
 
+         
 
             
             cam.Pos = new Vector2(500.0f, 200.0f);
@@ -99,9 +104,10 @@ namespace Farseer331_Setup
             floor.Position = new Vector2(GraphicsDevice.Viewport.Width / 2.0f, GraphicsDevice.Viewport.Height - 50);
             floor.body.BodyType = BodyType.Static;
 
-            wall = new DrawablePhysicsObject(world, floorTexture, new Vector2(10000f, floorTexture.Height), 1000);
+            wall = new DrawablePhysicsObject(world, floorTexture, new Vector2(floorTexture.Width, floorTexture.Height), 1000);
             wall.Position = new Vector2(GraphicsDevice.Viewport.Width / 2.0f, GraphicsDevice.Viewport.Height - 400);
-          
+            wall.body.FixedRotation = true;
+            wall.body.Rotation = 15.5f;
             wall.body.BodyType = BodyType.Static;
             
 
@@ -113,7 +119,7 @@ namespace Farseer331_Setup
             player = new DrawablePhysicsObject(world,null, new Vector2(36.0f, 48.0f), 1000);
           //  player = BodyFactory.CreateRectangle(world, 36*pixelToUnit, 48*pixelToUnit, 1f);
             player.Position = new Vector2(200.0f, 100.0f);
-        //    player.body.Rotation = 90;
+        //    player.body.body.Rotation = 90;
             player.body.BodyType = BodyType.Dynamic;
             
            
@@ -130,7 +136,11 @@ namespace Farseer331_Setup
        
        //     playerAnimation.Initialize(playerTexture, new Vector2(0, 0), 115, 69, 8, 30, Color.White, 1f, true);
             playerObj.Initialize(playerAnimation, new Vector2(player.Position.X, player.Position.Y));
-            
+
+
+            List<Texture2D> textures = new List<Texture2D>();
+            textures.Add(Content.Load<Texture2D>("white"));
+            particleEngine = new ParticleEngine(textures, new Vector2(playerObj.Position.X, playerObj.Position.Y));
 
             // TODO: use this.Content to load your game content here
         }
@@ -163,10 +173,10 @@ namespace Farseer331_Setup
         /// <param name="gameTime">Provides a snapshot of timing values.</param>
         protected override void Update(GameTime gameTime)
         {
-            playerObj.Update(gameTime);
+            
             playerObj.Position.X = player.Position.X;
             playerObj.Position.Y = player.Position.Y;
-            
+            playerObj.Update(gameTime);
             KeyboardState keyboardState = Keyboard.GetState();
             // Allows the game to exit
             if ((GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed) || (keyboardState.IsKeyDown(Keys.Escape)))
@@ -201,6 +211,14 @@ namespace Farseer331_Setup
                 
             }
 
+            if (keyboardState.IsKeyDown(Keys.A))
+            {
+
+                cam.Pos += new Vector2(-1f, 0f);
+
+
+            }
+
 
             if (keyboardState.IsKeyDown(Keys.S))
             {
@@ -210,9 +228,28 @@ namespace Farseer331_Setup
 
             }
 
+            if (keyboardState.IsKeyDown(Keys.P))
+            {
+
+                wall.body.Rotation += 0.1f;
+
+
+            }
+
+            if (keyboardState.IsKeyDown(Keys.W))
+            {
+
+                cam.Pos += new Vector2(0f, -1f);
+
+
+            }
+
             prevKeyboardState = keyboardState;
 
             world.Step((float)gameTime.ElapsedGameTime.TotalSeconds);
+
+            particleEngine.EmitterLocation = new Vector2(playerObj.Position.X, playerObj.Position.Y);
+            particleEngine.Update();
 
             base.Update(gameTime);
         }
@@ -225,8 +262,8 @@ namespace Farseer331_Setup
         {
             GraphicsDevice.Clear(Color.CornflowerBlue);
 
-            
 
+            
 
             spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, null, null, null, null, cam.get_transformation(GraphicsDevice));
 
@@ -240,13 +277,17 @@ namespace Farseer331_Setup
     //        spriteBatch.Draw(floorTexture,new Rectangle((int)floor.Position.X, (int)floor.Position.Y, (int)floorSize.X, (int)floorSize.Y), Color.White);
       //      spriteBatch.Draw(floorTexture, platform.Position, Color.White);
             platform.Draw(spriteBatch);
-            Rectangle wallRect = new Rectangle((int)wall.Position.X, (int)wall.Position.Y, (int)wall.Size.X, (int)wall.Size.Y);
+       //     Rectangle wallRect = new Rectangle((int)wall.Position.X, (int)wall.Position.Y, (int)wall.Size.X, (int)wall.Size.Y);
           //  spriteBatch.Draw(wall.texture, wallRect, null, Color.White, wall.body.Rotation, Vector2.Zero, SpriteEffects.None, 0);
             wall.Draw(spriteBatch);
             Console.WriteLine(wall.body.Rotation);
-    //        player.Draw(spriteBatch);
+    //        player.body.Draw(spriteBatch);
+
+            particleEngine.Draw(spriteBatch);
 
             spriteBatch.End();
+
+            
 
             base.Draw(gameTime);
         }

@@ -144,7 +144,7 @@ int frametime, Color color, float scale, bool looping)
             // Only draw the animation when we are active
             if (Active)
             {
-                spriteBatch.Draw(spriteStrip, destinationRect, sourceRect, color, rotation, Vector2.Zero, SpriteEffects.None, 0);
+                spriteBatch.Draw(spriteStrip, destinationRect, sourceRect, color, rotation, new Vector2(sourceRect.Width/2, sourceRect.Height/2), SpriteEffects.None, 0);
             }
         }
 
