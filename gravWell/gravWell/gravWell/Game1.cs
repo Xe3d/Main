@@ -33,6 +33,7 @@ namespace Farseer331_Setup
         DrawablePhysicsObject wall;
         DrawablePhysicsObject player;
         Texture2D floorTexture;
+        Texture2D white;
 
         KeyboardState prevKeyboardState;
         Random random;
@@ -43,7 +44,7 @@ namespace Farseer331_Setup
 
         public const float unitToPixel = 100.0f;
         public const float pixelToUnit = 1 / unitToPixel;
-
+        private List<PhysicsParticleObject> pList;
 
         
 
@@ -84,8 +85,8 @@ namespace Farseer331_Setup
             random = new Random();
 
 
-         
 
+            pList = new List<PhysicsParticleObject>();
             
             cam.Pos = new Vector2(500.0f, 200.0f);
 
@@ -140,7 +141,9 @@ namespace Farseer331_Setup
 
             List<Texture2D> textures = new List<Texture2D>();
             textures.Add(Content.Load<Texture2D>("white"));
-            particleEngine = new ParticleEngine(textures, new Vector2(playerObj.Position.X, playerObj.Position.Y));
+            white = Content.Load<Texture2D>("white");
+
+            particleEngine = new ParticleEngine(textures, new Vector2(playerObj.Position.X, playerObj.Position.Y), world);
 
             // TODO: use this.Content to load your game content here
         }
@@ -160,9 +163,12 @@ namespace Farseer331_Setup
         private void SpawnCrate()
         {
             DrawablePhysicsObject crate;
-            crate = new DrawablePhysicsObject(world, Content.Load<Texture2D>("Crate"), new Vector2(50.0f, 50.0f), 0.1f);
-            crate.Position = new Vector2(random.Next(50, GraphicsDevice.Viewport.Width - 50), 1);
-
+            crate = new DrawablePhysicsObject(world, Content.Load<Texture2D>("White"), new Vector2(1.0f, 1.0f), 0.1f);
+            crate.Position = new Vector2(playerObj.Position.X, playerObj.Position.Y);
+            if (playerObj.Facing == "right")
+            {
+                Vector2 targetPos = new Vector2(playerObj.Position.X + 100, random.Next(0, GraphicsDevice.Viewport.Height));
+            }
             crateList.Add(crate);
         }
 
@@ -184,10 +190,11 @@ namespace Farseer331_Setup
 
             if (keyboardState.IsKeyDown(Keys.Right)){
                 player.body.LinearVelocity += new Vector2(0.1f, 0.0f);
-                
+                playerObj.Facing = "right";
             }
             if (keyboardState.IsKeyDown(Keys.Left)){
                 player.body.LinearVelocity += new Vector2(-0.1f, 0.0f);
+                playerObj.Facing = "left";
             }
 
             
@@ -246,10 +253,22 @@ namespace Farseer331_Setup
 
             prevKeyboardState = keyboardState;
 
-            world.Step((float)gameTime.ElapsedGameTime.TotalSeconds);
 
+            if ((playerObj.Position.X - cam._pos.X) > graphics.GraphicsDevice.Viewport.Width * 0.40)
+                cam._pos += new Vector2(player.body.LinearVelocity.X, 0f);
+
+
+            if ((playerObj.Position.X - cam._pos.X) < -graphics.GraphicsDevice.Viewport.Width*0.40)
+                cam._pos += new Vector2(player.body.LinearVelocity.X, 0f);
+           
             particleEngine.EmitterLocation = new Vector2(playerObj.Position.X, playerObj.Position.Y);
-            particleEngine.Update();
+            if (keyboardState.IsKeyDown(Keys.LeftControl))
+            {
+
+                SpawnCrate();
+            }
+            world.Step((float)gameTime.ElapsedGameTime.TotalSeconds);
+            
 
             base.Update(gameTime);
         }
@@ -269,27 +288,52 @@ namespace Farseer331_Setup
 
             foreach (DrawablePhysicsObject crate in crateList)
             {
-                crate.Draw(spriteBatch);
+                crate.Draw(spriteBatch, Color.Red);
             }
 
             playerObj.Draw(spriteBatch, player.body.Rotation);
-            floor.Draw(spriteBatch);
+            floor.Draw(spriteBatch, Color.White);
     //        spriteBatch.Draw(floorTexture,new Rectangle((int)floor.Position.X, (int)floor.Position.Y, (int)floorSize.X, (int)floorSize.Y), Color.White);
       //      spriteBatch.Draw(floorTexture, platform.Position, Color.White);
-            platform.Draw(spriteBatch);
+            platform.Draw(spriteBatch, Color.White);
        //     Rectangle wallRect = new Rectangle((int)wall.Position.X, (int)wall.Position.Y, (int)wall.Size.X, (int)wall.Size.Y);
           //  spriteBatch.Draw(wall.texture, wallRect, null, Color.White, wall.body.Rotation, Vector2.Zero, SpriteEffects.None, 0);
-            wall.Draw(spriteBatch);
+            wall.Draw(spriteBatch, Color.White);
             Console.WriteLine(wall.body.Rotation);
+        Console.WriteLine(crateList.Count);
     //        player.body.Draw(spriteBatch);
 
             particleEngine.Draw(spriteBatch);
+
+           
+            
+            for (int index = 0; index < pList.Count; index++)
+            {
+                pList[index].Draw(spriteBatch);
+            }
+            
+        
+
 
             spriteBatch.End();
 
             
 
             base.Draw(gameTime);
+     
         }
+
+        private void GenerateNewParticle()
+        {
+
+
+            
+            PhysicsParticleObject particle = new PhysicsParticleObject(world, white, Color.Red, playerObj.Position, new Vector2(1f, 1f), 100f);
+            particle.body.AngularVelocity = 0.1f * (float)(random.NextDouble() * 2 - 1);
+            pList.Add(particle);
+
+
+        }
+
     }
 }

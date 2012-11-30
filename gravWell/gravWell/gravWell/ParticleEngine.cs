@@ -4,6 +4,9 @@ using System.Linq;
 using System.Text;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using FarseerPhysics.Dynamics;
+using FarseerPhysics.Factories;
+using Shooter.PhysicsObjects;
 
 namespace Farseer331_Setup
 {
@@ -12,49 +15,44 @@ namespace Farseer331_Setup
 
         private Random random;
         public Vector2 EmitterLocation { get; set; }
-        private List<Particle> particles;
+        private List<PhysicsParticleObject> particles;
         private List<Texture2D> textures;
+        World pWorld;
+      //  public PhysicsParticleObject particle;
 
 
-
-        public ParticleEngine(List<Texture2D> textures, Vector2 location)
+        public ParticleEngine(List<Texture2D> textures, Vector2 location, World world)
         {
             EmitterLocation = location;
             this.textures = textures;
-            this.particles = new List<Particle>();
+            this.particles = new List<PhysicsParticleObject>();
             random = new Random();
+            pWorld = world;
         }
 
-        private Particle GenerateNewParticle()
+       private void GenerateNewParticle()
         {
+        
+          
             Texture2D texture = textures[random.Next(textures.Count)];
-            Vector2 position = EmitterLocation;
-            Vector2 velocity = new Vector2(
-                    1f * (float)(random.NextDouble() * 2 - 1),
-                    1f * (float)(random.NextDouble() * 2 - 1));
-            float angle = 0;
-            float angularVelocity = 0.1f * (float)(random.NextDouble() * 2 - 1);
-            Color color = new Color(
-                    (float)random.NextDouble(),
-                    (float)random.NextDouble(),
-                    (float)random.NextDouble());
-            float size = (float)random.NextDouble();
-           // int ttl = 20 + random.Next(40);
-            int ttl = 1;
-            return new Particle(texture, position, velocity, angle, angularVelocity, color, size, ttl);
+            PhysicsParticleObject particle = new PhysicsParticleObject(pWorld, texture,Color.Red,EmitterLocation, new Vector2(1f,1f), 100f);
+            particle.body.AngularVelocity = 0.1f * (float)(random.NextDouble() * 2 - 1);
+            particles.Add(particle);
+           
+
         }
 
 
-        public void Update()
+        public void Update(GameTime gameTime)
         {
-            int total = 10;
+            int total = 1;
 
             for (int i = 0; i < total; i++)
             {
-                particles.Add(GenerateNewParticle());
+                GenerateNewParticle();
             }
 
-            for (int particle = 0; particle < particles.Count; particle++)
+          /*  for (int particle = 0; particle < particles.Count; particle++)
             {
                 particles[particle].Update();
                 if (particles[particle].TTL <= 0)
@@ -62,7 +60,8 @@ namespace Farseer331_Setup
                     particles.RemoveAt(particle);
                     particle--;
                 }
-            }
+            }*/
+           pWorld.Step((float)gameTime.ElapsedGameTime.TotalSeconds);
         }
 
 

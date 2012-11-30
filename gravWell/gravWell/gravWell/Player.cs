@@ -31,6 +31,8 @@ namespace Shooter
             get { return PlayerAnimation.FrameHeight; }
         }
 
+        public string Facing;
+        
 
         // Initialize the player
         public void Initialize(Animation animation, Vector2 position)

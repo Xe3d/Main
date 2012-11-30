@@ -4,6 +4,8 @@ using System.Linq;
 using System.Text;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using FarseerPhysics.Factories;
+using FarseerPhysics.Dynamics;
 
 namespace Farseer331_Setup
 {
@@ -17,10 +19,11 @@ namespace Farseer331_Setup
         public Color Color { get; set; }            // The color of the particle
         public float Size { get; set; }                // The size of the particle
         public int TTL { get; set; }
-
+        public Body body;
+       
 
         public Particle(Texture2D texture, Vector2 position, Vector2 velocity,
-            float angle, float angularVelocity, Color color, float size, int ttl)
+            float angle, float angularVelocity, Color color, float size, int ttl, World world)
         {
             Texture = texture;
             Position = position;
@@ -30,12 +33,13 @@ namespace Farseer331_Setup
             Color = color;
             Size = size;
             TTL = ttl;
+            body = BodyFactory.CreateRectangle(world, size, size, 100f);
         }
 
 
         public void Update()
         {
-            
+            Position = body.Position;
             Position += Velocity;
             Angle += AngularVelocity;
         }
